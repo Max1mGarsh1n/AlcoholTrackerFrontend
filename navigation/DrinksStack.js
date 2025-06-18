@@ -1,0 +1,38 @@
+import { createStackNavigator } from '@react-navigation/stack';
+import DrinksScreen from '../src/screens/main/drinks/DrinksScreen';
+import DrinkDetailScreen from '../src/screens/main/drinks/DrinkDetailScreen';
+import AddDrinkScreen from '../src/screens/main/drinks/AddDrinkScreen';
+
+const Stack = createStackNavigator();
+
+export default function DrinksStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen name="DrinksMain" component={DrinksScreen} />
+      <Stack.Screen 
+        name="DrinkDetail" 
+        component={DrinkDetailScreen}
+        options={{ 
+          headerShown: true,
+          headerStyle: { backgroundColor: 'black' },
+          headerTintColor: 'white',
+          title: 'Детали напитка'
+        }}
+      />
+      <Stack.Screen 
+        name="AddDrink" 
+        component={AddDrinkScreen}
+        options={{ 
+          headerShown: true,
+          headerStyle: { backgroundColor: 'black' },
+          headerTintColor: 'white',
+          title: 'Добавить напиток'
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
