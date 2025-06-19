@@ -1,9 +1,8 @@
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import ProfileScreen from '../src/screens/main/profile/ProfileScreen';
-import AccountDataScreen from '../src/screens/main/profile/AccountDataScreen';
-import ParametersScreen from '../src/screens/main/profile/ParametersScreen'; 
+import ProfileScreen from '../screens/main/profile/ProfileScreen';
+import AccountDataScreen from '../screens/main/profile/AccountDataScreen';
+import ParametersScreen from '../screens/main/profile/ParametersScreen'; 
 
 const Stack = createStackNavigator();
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { saveTokens } from '../../auth/authService';
-import { navigateToMainApp } from '../../../navigation/navigationHelpers';
+import { navigateToMainApp } from '../../navigation/NavigationHelpers';
 
 const API_URL = 'http://178.234.175.204:8080/api';
 
