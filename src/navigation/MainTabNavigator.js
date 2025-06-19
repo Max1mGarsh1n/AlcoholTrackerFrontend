@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import PartiesScreen from '../src/screens/main/parties/PartiesScreen';
+import PartiesScreen from '../../src/screens/main/parties/PartiesScreen';
 import DrinksStack from './DrinksStack';
 import ProfileStack from './ProfileStack';
 

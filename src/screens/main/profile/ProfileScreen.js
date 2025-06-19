@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { navigateToAuth } from '../../../../navigation/navigationHelpers';
+import { navigateToAuth } from '../../../navigation/NavigationHelpers';
 
 const ProfileScreen = ({ navigation }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
