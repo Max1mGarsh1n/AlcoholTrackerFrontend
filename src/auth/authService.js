@@ -1,8 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'http://178.234.175.204:8080/api';
+ const API_URL = 'http://192.168.1.136:8080/api';
+//const API_URL = 'http://83.139.159.240:8080/api'; // Гаджиев
 
-// Сохранение токенов
 export const saveTokens = async (accessToken, refreshToken) => {
   try {
     await SecureStore.setItemAsync('accessToken', accessToken);

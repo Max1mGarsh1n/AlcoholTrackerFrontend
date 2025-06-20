@@ -13,8 +13,8 @@ export const validateLoginForm = (email, password) => {
   if (!password) {
     errors.password = 'Введите пароль';
     isValid = false;
-  } else if (password.length < 6) {
-    errors.password = 'Пароль должен содержать минимум 6 символов';
+  } else if (password.length < 4) {
+    errors.password = 'Пароль должен содержать минимум 4 символа';
     isValid = false;
   }
 
@@ -40,8 +40,8 @@ export const validateRegisterForm = (username, email, password) => {
   if (!password) {
     errors.password = 'Введите пароль';
     isValid = false;
-  } else if (password.length < 6) {
-    errors.password = 'Пароль должен содержать минимум 6 символов';
+  } else if (password.length < 4) {
+    errors.password = 'Пароль должен содержать минимум 4 символа';
     isValid = false;
   }
 

@@ -1,6 +1,7 @@
 import { saveTokens } from '../auth/authService';
 
-const API_URL = 'http://178.234.175.204:8080/api';
+ const API_URL = 'http://192.168.1.136:8080/api';
+// const API_URL = 'http://83.139.159.240:8080/api'; // Гаджиев
 
 export const loginUser = async (email, password) => {
   try {
@@ -17,7 +18,13 @@ export const loginUser = async (email, password) => {
 
     const data = await response.json();
     await saveTokens(data.accessToken, data.refreshToken);
-    return { success: true };
+    
+    // Сохраняем userId
+    if (data.userId) {
+      await SecureStore.setItemAsync('userId', data.userId.toString());
+    }
+    
+    return { success: true, userId: data.userId };
   } catch (error) {
     console.error('Login API error:', error);
     return { 
