@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import AuthHeader from '../../../components/auth/AuthHeader';
 import Button from '../../../components/common/Button';
 import TextInput from '../../../components/common/TextInput';
 import { loginUser } from '../../../api/authApi';
-import { navigateToMainApp } from '../../../navigation/NavigationHelpers';
 import { validateLoginForm } from '../../../utils/validators';
+import { AuthContext } from '../../../context/AuthContext';
 import styles from './LoginScreen.styles';
 
 const LoginScreen = ({ navigation }) => {
+  const { login, isAuthenticated } = useContext(AuthContext);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,25 +20,24 @@ const LoginScreen = ({ navigation }) => {
     general: ''
   });
 
-  const handleLogin = async () => {
-    const { isValid, errors: validationErrors } = validateLoginForm(email, password);
-    
-    if (!isValid) {
-      setErrors(validationErrors);
-      return;
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.navigate('Profile');
     }
+  }, [isAuthenticated]);
 
+  const handleLogin = async () => {
     setLoading(true);
-    setErrors({ ...errors, general: '' });
-    
+    setErrors({ email: '', password: '', general: '' });
+
     const result = await loginUser(email, password);
     
     if (result.success) {
-      navigateToMainApp(navigation);
+      await login(result.token);
     } else {
-      setErrors({ ...validationErrors, general: result.error });
+      setErrors({ ...errors, general: result.error });
     }
-    
+
     setLoading(false);
   };
 
@@ -74,11 +75,7 @@ const LoginScreen = ({ navigation }) => {
             </Text>
           ) : null}
           
-          <Button 
-            title="Войти" 
-            onPress={handleLogin}
-            isLoading={loading}
-          />
+          <Button title="Войти" onPress={handleLogin} isLoading={loading} />
         </View>
         
         <View style={styles.newUser}>

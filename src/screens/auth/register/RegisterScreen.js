@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { View, Text } from 'react-native';
 import AuthHeader from '../../../components/auth/AuthHeader';
 import Button from '../../../components/common/Button';
 import TextInput from '../../../components/common/TextInput';
 import { registerUser } from '../../../api/authApi';
-import { navigateToMainApp } from '../../../navigation/NavigationHelpers';
 import { validateRegisterForm } from '../../../utils/validators';
+import { AuthContext } from '../../../context/AuthContext';
 import styles from './RegisterScreen.styles';
 
 const RegisterScreen = ({ navigation }) => {
+  const { login } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,15 +32,20 @@ const RegisterScreen = ({ navigation }) => {
     setLoading(true);
     setErrors({ ...errors, general: '' });
     
-    const result = await registerUser(username, email, password);
-    
-    if (result.success) {
-      navigateToMainApp(navigation);
-    } else {
-      setErrors({ ...validationErrors, general: result.error });
+    try {
+      const result = await registerUser(username, email, password);
+      
+      if (result.success) {
+        // После успешной регистрации автоматически логиним пользователя
+        await login(result.token);
+      } else {
+        setErrors({ ...validationErrors, general: result.error });
+      }
+    } catch (error) {
+      setErrors({ ...errors, general: error.message });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (

@@ -2,37 +2,45 @@ import { getUserIdFromToken } from '../utils/jwtUtils';
 import * as SecureStore from 'expo-secure-store';
 import { API_URL } from '../config/config';
 
+// export const logoutUser = async (token) => {
+//   try {
+//     if (!token) {
+//       console.warn('No token provided for logout');
+//       return { success: true }; // Все равно продолжаем локальный логаут
+//     }
+
+//     const response = await fetch(`${API_URL}/auth/logout`, {
+//       method: 'POST',
+//       headers: { 
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.message || 'Logout failed');
+//     }
+
+//     return { success: true };
+//   } catch (error) {
+//     console.error('Logout API error:', error);
+//     return {
+//       success: false,
+//       error: error.message || 'Ошибка при выходе. Попробуйте снова.'
+//     };
+//   }
+// };
+
 export const logoutUser = async () => {
-  try {
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    if (!accessToken) throw new Error('No access token found');
-
-    const response = await fetch(`${API_URL}/auth/logout`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Logout failed');
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error('Logout API error:', error);
-    return {
-      success: false,
-      error: error.message || 'Logout failed. Please try again.'
-    };
-  }
+  // Ничего не делаем с API, чисто фронтенд-действия
+  return { success: true };
 };
 
 export const fetchUserProfile = async () => {
   try {
     const userId = await getUserIdFromToken();
+    console.debug("fetchUserProfile:", userId);
     if (!userId) throw new Error('User ID not found');
 
     const response = await fetch(`${API_URL}/users/${userId}/profile`, {

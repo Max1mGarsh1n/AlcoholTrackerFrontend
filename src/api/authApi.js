@@ -11,17 +11,23 @@ export const loginUser = async (email, password) => {
       body: JSON.stringify({ email: email.trim(), password })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Неверные учетные данные');
+      throw new Error(data.message || 'Неверные учетные данные');
     }
 
-    const { accessToken } = await response.json();
-    console.log('accessToken:', accessToken);
-    await SecureStore.setItemAsync('accessToken', accessToken);
-    await saveUserData(accessToken); // Сохраняем данные из токена
-    
-    return { success: true };
+    if (!data.accessToken) {
+      throw new Error('Токен не получен от сервера');
+    }
+
+    await SecureStore.setItemAsync('accessToken', data.accessToken);
+    await saveUserData(data.accessToken);
+
+    return { 
+      success: true, 
+      token: data.accessToken // Убедимся что это строка
+    };
   } catch (error) {
     console.error('Login API error:', error);
     return { 
@@ -43,17 +49,23 @@ export const registerUser = async (username, email, password) => {
       })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Ошибка регистрации');
+      throw new Error(data.message || 'Ошибка регистрации');
     }
 
-    const { accessToken } = await response.json();
-    console.log('accessToken:', accessToken);
-    await SecureStore.setItemAsync('accessToken', accessToken);
-    await saveUserData(accessToken);
+    if (!data.accessToken) {
+      throw new Error('Токен не получен от сервера');
+    }
 
-    return { success: true };
+    await SecureStore.setItemAsync('accessToken', data.accessToken);
+    await saveUserData(data.accessToken);
+
+    return { 
+      success: true,
+      token: data.accessToken // Возвращаем токен для автоматического входа
+    };
   } catch (error) {
     console.error('Register API error:', error);
     return { 

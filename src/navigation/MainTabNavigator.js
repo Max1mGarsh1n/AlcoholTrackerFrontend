@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import PartiesScreen from '../../src/screens/main/parties/PartiesScreen';
+import PartiesStack from './PartiesStack';
 import DrinksStack from './DrinksStack';
 import ProfileStack from './ProfileStack';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabNavigator() {
+const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -30,9 +30,11 @@ export default function MainTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Parties" component={PartiesScreen} />
+      <Tab.Screen name="Parties" component={PartiesStack} />
       <Tab.Screen name="Drinks" component={DrinksStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }
+
+export default MainTabNavigator;
