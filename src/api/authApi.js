@@ -1,7 +1,7 @@
-import { saveTokens } from '../auth/authService';
-
- const API_URL = 'http://192.168.1.136:8080/api';
-// const API_URL = 'http://83.139.159.240:8080/api'; // Гаджиев
+import { saveToken } from '../utils/storage';
+import {API_URL} from '../config/config';
+import { saveUserData } from '../utils/jwtUtils';
+import * as SecureStore from 'expo-secure-store';
 
 export const loginUser = async (email, password) => {
   try {
@@ -16,15 +16,12 @@ export const loginUser = async (email, password) => {
       throw new Error(errorData.message || 'Неверные учетные данные');
     }
 
-    const data = await response.json();
-    await saveTokens(data.accessToken, data.refreshToken);
+    const { accessToken } = await response.json();
+    console.log('accessToken:', accessToken);
+    await SecureStore.setItemAsync('accessToken', accessToken);
+    await saveUserData(accessToken); // Сохраняем данные из токена
     
-    // Сохраняем userId
-    if (data.userId) {
-      await SecureStore.setItemAsync('userId', data.userId.toString());
-    }
-    
-    return { success: true, userId: data.userId };
+    return { success: true };
   } catch (error) {
     console.error('Login API error:', error);
     return { 
@@ -51,8 +48,12 @@ export const registerUser = async (username, email, password) => {
       throw new Error(errorData.message || 'Ошибка регистрации');
     }
 
-    const data = await response.json();
-    return { success: true, data };
+    const { accessToken } = await response.json();
+    console.log('accessToken:', accessToken);
+    await SecureStore.setItemAsync('accessToken', accessToken);
+    await saveUserData(accessToken);
+
+    return { success: true };
   } catch (error) {
     console.error('Register API error:', error);
     return { 

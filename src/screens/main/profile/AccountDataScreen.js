@@ -1,23 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { updateUserProfile } from '../../../api/profileApi';
 import styles from './AccountDataScreen.styles';
 
 const AccountDataScreen = ({ navigation, route }) => {
   const { userData } = route.params || {};
 
   // Состояния для редактируемых полей
-  const [name, setName] = useState(userData?.name || '');
-  const [phone, setPhone] = useState(userData?.phone || '');
+  const [username, setUsername] = useState(userData?.username || '');
   const [email, setEmail] = useState(userData?.email || '');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = () => {
-    const updatedData = {
-      name,
-      phone,
-      email
-    };
-    console.log('Данные сохранены:', updatedData);
-    navigation.goBack();
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Используем текущие значения из состояния, а не из userData
+      const body = {
+        username,
+        email,
+        // Добавляем остальные поля, которые могут требоваться на бэкенде
+        gender: userData?.gender,
+        age: userData?.age,
+        height: userData?.height,
+        weight: userData?.weight
+      };
+
+      const updatedProfile = await updateUserProfile(body);
+      
+      Alert.alert(
+        'Успех', 
+        'Данные успешно обновлены',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+      
+    } catch (error) {
+      console.error('Save error:', error);
+      Alert.alert('Ошибка', error.message || 'Не удалось сохранить изменения');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,20 +52,9 @@ const AccountDataScreen = ({ navigation, route }) => {
             <Text style={styles.dataLabel}>Имя</Text>
             <TextInput
               style={styles.input}
-              value={name}
-              onChangeText={setName}
+              value={username}
+              onChangeText={setUsername}
               placeholder="Введите имя"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.dataLabel}>Телефон</Text>
-            <TextInput
-              style={styles.input}
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Введите телефон"
-              keyboardType="phone-pad"
             />
           </View>
 

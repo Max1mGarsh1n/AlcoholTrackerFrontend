@@ -1,27 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, React } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, ScrollView, Switch, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { logoutUser, fetchUserProfile } from '../../../api/userApi';
-import * as SecureStore from 'expo-secure-store';
+import { logoutUser, fetchUserProfile } from '../../../api/profileApi';
+import { clearAuthData } from '../../../utils/storage';
 import { navigateToAuth } from '../../../navigation/NavigationHelpers';
 import styles from './ProfileScreen.styles';
 
 const ProfileScreen = ({ navigation }) => {
+  const isFocused = useIsFocused();
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const loadUserProfile = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const userId = await SecureStore.getItemAsync('userId');
-      if (!userId) throw new Error('User ID not found');
-      
-      const data = await fetchUserProfile(userId);
+      const data = await fetchUserProfile();
+      console.log('Received user data:', data);
       setUserData(data);
+      setUsername(data.username);
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -29,30 +33,39 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    loadUserProfile();
-  }, []);
-
   const handleLogout = async () => {
-  try {
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
-    if (refreshToken) await logoutUser(refreshToken);
-    
-    // Очищаем все данные
-    await SecureStore.deleteItemAsync('accessToken');
-    await SecureStore.deleteItemAsync('refreshToken');
-    await SecureStore.deleteItemAsync('userId');
-    
-    navigateToAuth(navigation);
-  } catch (error) {
-    console.error('Logout error:', error);
-    // Принудительная очистка
-    await SecureStore.deleteItemAsync('accessToken');
-    await SecureStore.deleteItemAsync('refreshToken');
-    await SecureStore.deleteItemAsync('userId');
-    navigateToAuth(navigation);
-  }
-};
+    try {
+      setLogoutLoading(true);
+      setError(null);
+      
+      // 1. Пытаемся выполнить логаут на бэкенде
+      const result = await logoutUser();
+      
+      // 2. В любом случае очищаем локальные данные
+      await clearAuthData();
+      
+      // 3. Если логаут на бэкенде не удался, показываем ошибку
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+      
+      // 4. Перенаправляем на экран авторизации
+      navigateToAuth(navigation);
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('An unexpected error occurred');
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      loadUserProfile();
+    }
+  }, [isFocused]);
 
   if (loading) {
     return (
@@ -81,8 +94,9 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <Text style={styles.name}>
-            {userData?.name || 'Пользователь'}
+            {userData?.name || username || 'Пользователь'}
           </Text>
+          {username && <Text style={styles.username}></Text>}
         </View>
 
         <View style={styles.section}>
@@ -95,7 +109,7 @@ const ProfileScreen = ({ navigation }) => {
           <ProfileItem 
             icon="settings" 
             title="Параметры" 
-            onPress={() => navigation.navigate('ParametersScreen')} 
+            onPress={() => navigation.navigate('ParametersScreen', { userData })}
           />
         </View>
 
@@ -113,9 +127,19 @@ const ProfileScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <TouchableOpacity 
+        style={styles.logoutButton} 
+        onPress={handleLogout}
+        disabled={logoutLoading}
+      >
+        {logoutLoading ? (
+          <ActivityIndicator color="white" />
+        ) : (
           <Text style={styles.logoutText}>Выйти из аккаунта</Text>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
     </View>
   );

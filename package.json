@@ -17,6 +17,7 @@
     "@react-navigation/native-stack": "^7.3.16",
     "@react-navigation/stack": "^7.3.4",
     "expo": "~53.0.10",
+    "expo-jwt": "^1.8.2",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "jwt-decode": "^4.0.0",
