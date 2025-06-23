@@ -9,7 +9,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import styles from './RegisterScreen.styles';
 
 const RegisterScreen = ({ navigation }) => {
-  const { login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -92,7 +92,7 @@ const RegisterScreen = ({ navigation }) => {
           
           <Button 
             title="Зарегистрироваться"
-            onPress={handleRegister}
+            onPress={() => {register(username, email, password)}}
             isLoading={loading}
           />
         </View>

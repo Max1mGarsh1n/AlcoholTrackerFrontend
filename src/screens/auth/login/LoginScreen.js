@@ -9,7 +9,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import styles from './LoginScreen.styles';
 
 const LoginScreen = ({ navigation }) => {
-  const { login, isAuthenticated } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,12 +19,6 @@ const LoginScreen = ({ navigation }) => {
     password: '',
     general: ''
   });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigation.navigate('Profile');
-    }
-  }, [isAuthenticated]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -75,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
             </Text>
           ) : null}
           
-          <Button title="Войти" onPress={handleLogin} isLoading={loading} />
+          <Button title="Войти" onPress={() => {login(email, password)}} isLoading={loading} />
         </View>
         
         <View style={styles.newUser}>

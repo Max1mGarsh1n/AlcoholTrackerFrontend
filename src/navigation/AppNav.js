@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, ActivityIndicator } from 'react-native'
 import React, { useContext } from 'react'
 import AuthStack from './AuthStack'
 import MainTabNavigator from './MainTabNavigator'
@@ -8,12 +8,12 @@ import { AuthContext } from '../context/AuthContext'
 const AppNav = () => {
   const {isLoading, userToken} = useContext(AuthContext);
 
-  if ( isLoading ) {
-    <View>
-        <Text>
-            Загрузка
-        </Text>
-    </View>
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (

@@ -24,9 +24,11 @@ export const loginUser = async (email, password) => {
     await SecureStore.setItemAsync('accessToken', data.accessToken);
     await saveUserData(data.accessToken);
 
+    console.log("SUCCESSFUL LOGIN!: ", data);
+
     return { 
       success: true, 
-      token: data.accessToken // Убедимся что это строка
+      token: data.accessToken
     };
   } catch (error) {
     console.error('Login API error:', error);
@@ -61,6 +63,8 @@ export const registerUser = async (username, email, password) => {
 
     await SecureStore.setItemAsync('accessToken', data.accessToken);
     await saveUserData(data.accessToken);
+
+    console.log("SUCCESSFUL REGISTER!: ", data);
 
     return { 
       success: true,
