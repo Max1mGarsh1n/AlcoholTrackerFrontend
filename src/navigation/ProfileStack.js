@@ -17,12 +17,20 @@ export default function ProfileStackNavigator() {
       <Stack.Screen 
         name="AccountDataScreen" 
         component={AccountDataScreen} 
-        options={{ title: 'Данные аккаунта' }} 
+        options={{ 
+          title: 'Данные аккаунта',
+          headerStyle: { backgroundColor: 'black' },
+          headerTintColor: 'white',
+        }} 
       />
       <Stack.Screen 
         name="ParametersScreen" 
         component={ParametersScreen} 
-        options={{ title: 'Параметры' }} 
+        options={{ 
+          title: 'Параметры',
+          headerStyle: { backgroundColor: 'black' },
+          headerTintColor: 'white',
+        }} 
       />
     </Stack.Navigator>
   );

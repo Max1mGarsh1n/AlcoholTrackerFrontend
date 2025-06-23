@@ -1,82 +1,101 @@
 import styles from './PartiesScreen.styles';
-import { useState, useEffect } from 'react';
-import { useIsFocused } from '@react-navigation/native';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useState, useEffect, useCallback } from 'react';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { fetchParties } from '../../../api/partiesApi';
-import * as SecureStore from 'expo-secure-store';
+import { getStoredUserData } from '../../../utils/storage';
 
 export default function PartiesScreen() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const [userId, setUserId] = useState(null);
   const [parties, setParties] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadParties = async () => {
+  const loadParties = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (!isRefresh) setLoading(true);
       setError(null);
-      
+
+      const userInfo = await getStoredUserData();
       const data = await fetchParties();
-      console.log('Loaded parties:', data);
-      
-      if (!Array.isArray(data)) {
-        throw new Error('Некорректный формат данных');
-      }
-      
+
+      if (!Array.isArray(data)) throw new Error('Некорректный формат данных');
+
+      setUserId(userInfo.userId);
       setParties(data);
     } catch (err) {
       console.error('Load parties error:', err);
       setError(err.message || 'Ошибка загрузки данных');
     } finally {
-      setLoading(false);
+      if (isRefresh) setRefreshing(false);
+      else setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isFocused) {
-      loadParties();
-    }
+    if (isFocused) loadParties();
   }, [isFocused]);
 
-  const renderPartyItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.partyItem}
-      onPress={() => navigation.navigate('PartyDetailsScreen', { 
-        partyId: item.partyId,
-        userId: user.userId
-      })}
-    >
-      <Text style={styles.partyDate}>
-        {new Date(item.date).toLocaleDateString('ru-RU', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        })}
-      </Text>
-      <Text style={styles.partyDescription}>{item.place}</Text>
-    </TouchableOpacity>
-  );
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadParties(true);
+  }, []);
+
+  const renderPartyItem = ({ item }) => {
+  const handlePress = async () => {
+    try {
+      const userInfo = await getStoredUserData();
+      const currentUserId = item.userId || userInfo.userId;
+      
+      if (!currentUserId) {
+        throw new Error('Не удалось определить ID пользователя');
+      }
+
+      navigation.navigate({
+        name: 'PartyDetails',
+        params: {
+          partyId: item.partyId,
+          userId: currentUserId,
+          uniqueKey: `${item.partyId}_${Date.now()}`
+        },
+        key: `${item.partyId}_${Date.now()}`
+      });
+    } catch (err) {
+      console.error('Navigation error:', err);
+    }
+  };
+
+  return (
+      <TouchableOpacity style={styles.partyItem} onPress={handlePress}>
+        <Text style={styles.partyDate}>
+          {new Date(item.date).toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </Text>
+        <Text style={styles.partyDescription}>{item.place}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
+      <View style={[styles.container, styles.centeredContent]}>
+        <ActivityIndicator size="large" color="#d3ae35" />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, styles.centeredContent]}>
         <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity 
-          style={styles.retryButton}
-           onPress={loadParties}
-        >
-          <Text>Попробовать снова</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => loadParties()}>
+          <Text style={styles.retryButtonText}>Попробовать снова</Text>
         </TouchableOpacity>
       </View>
     );
@@ -84,27 +103,40 @@ export default function PartiesScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <TouchableOpacity 
+      {/* Верхняя часть, которая центрирует кнопку */}
+      <View style={styles.topContainer}>
+        <TouchableOpacity
           style={styles.newPartyButton}
           onPress={() => navigation.navigate('NewParty')}
         >
           <Text style={styles.buttonText}>Создать новое застолье</Text>
         </TouchableOpacity>
+      </View>
 
+      {/* Нижняя часть с историей фиксированной высоты */}
+      <View style={styles.historyContainer}>
         <Text style={styles.historyTitle}>История застолий</Text>
-        
         {parties.length > 0 ? (
           <FlatList
             data={parties}
             renderItem={renderPartyItem}
-            keyExtractor={item => item.partyId.toString()}
-            scrollEnabled={false}
+            keyExtractor={(item) => item.partyId.toString()}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={['#d3ae35']}
+                tintColor="#d3ae35"
+              />
+            }
+            contentContainerStyle={{ paddingBottom: 20 }}
           />
         ) : (
-          <Text style={styles.emptyText}>У вас пока нет сохранённых застолий</Text>
+          <Text style={styles.emptyText}>
+            У вас пока нет сохранённых застолий
+          </Text>
         )}
-      </ScrollView>
+      </View>
     </View>
   );
 }

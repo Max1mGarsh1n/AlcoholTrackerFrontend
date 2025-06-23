@@ -17,8 +17,16 @@ export default function DrinksScreen({ navigation }) {
           tabBarStyle: { backgroundColor: 'black' },
         }}
       >
-        <TopTab.Screen name="BasicDrinks" component={BasicDrinksScreen} />
-        <TopTab.Screen name="CustomDrinks" component={CustomDrinksScreen} />
+        <TopTab.Screen 
+          name="BasicDrinks" 
+          component={BasicDrinksScreen} 
+          options={{ title: 'Общие' }} 
+        />
+        <TopTab.Screen 
+          name="CustomDrinks" 
+          component={CustomDrinksScreen} 
+          options={{ title: 'Ваши' }} 
+        />
       </TopTab.Navigator>
     </View>
   );

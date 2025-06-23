@@ -24,7 +24,7 @@ export default StyleSheet.create({
   inputGroup: {
     marginBottom: 20,
   },
-  dataLabel: {
+  label: {
     fontSize: 16,
     color: '#fefffa',
     marginBottom: 8,
@@ -36,6 +36,29 @@ export default StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+  },
+  genderToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  genderOption: {
+    flex: 1,
+    padding: 12,
+    marginHorizontal: 5,
+    borderRadius: 8,
+    backgroundColor: '#3a3a3a',
+    alignItems: 'center',
+  },
+  genderSelected: {
+    backgroundColor: '#5a7454',
+  },
+  genderText: {
+    color: '#fefffa',
+    fontSize: 16,
+  },
+  genderTextSelected: {
+    fontWeight: 'bold',
+    color: '#fefffa',
   },
   saveButton: {
     backgroundColor: '#5a7454',

@@ -1,80 +1,53 @@
-import { saveToken } from '../utils/storage';
 import {API_URL} from '../config/config';
-import { saveUserData } from '../utils/jwtUtils';
-import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim(), password })
+    const response = await axios.post(`${API_URL}/auth/login`, {
+      email: email.trim(),
+      password
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Неверные учетные данные');
+    const { accessToken } = response.data;
+    if (!accessToken) {
+      return { success: false, error: 'Токен не получен' };
     }
 
-    if (!data.accessToken) {
-      throw new Error('Токен не получен от сервера');
-    }
-
-    await SecureStore.setItemAsync('accessToken', data.accessToken);
-    await saveUserData(data.accessToken);
-
-    console.log("SUCCESSFUL LOGIN!: ", data);
-
-    return { 
-      success: true, 
-      token: data.accessToken
-    };
+    return { success: true, token: accessToken };
   } catch (error) {
-    console.error('Login API error:', error);
-    return { 
-      success: false, 
-      error: error.message || 'Ошибка сети. Попробуйте позже.' 
+    return {
+      success: false,
+      error: error?.response?.data?.message || 'Ошибка входа'
     };
   }
 };
 
 export const registerUser = async (username, email, password) => {
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        username: username.trim(), 
-        email: email.trim(), 
-        password 
-      })
+    const response = await axios.post(`${API_URL}/auth/register`, {
+      username: username.trim(),
+      email: email.trim(),
+      password
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Ошибка регистрации');
+    const { accessToken } = response.data;
+    if (!accessToken) {
+      return { success: false, error: 'Токен не получен' };
     }
 
-    if (!data.accessToken) {
-      throw new Error('Токен не получен от сервера');
-    }
-
-    await SecureStore.setItemAsync('accessToken', data.accessToken);
-    await saveUserData(data.accessToken);
-
-    console.log("SUCCESSFUL REGISTER!: ", data);
-
-    return { 
-      success: true,
-      token: data.accessToken // Возвращаем токен для автоматического входа
-    };
+    return { success: true, token: accessToken };
   } catch (error) {
-    console.error('Register API error:', error);
-    return { 
-      success: false, 
-      error: error.message || 'Ошибка сети. Попробуйте позже.' 
+    return {
+      success: false,
+      error: error?.response?.data?.message || 'Ошибка регистрации'
     };
   }
 };

@@ -3,7 +3,6 @@ import { View, Text } from 'react-native';
 import AuthHeader from '../../../components/auth/AuthHeader';
 import Button from '../../../components/common/Button';
 import TextInput from '../../../components/common/TextInput';
-import { registerUser } from '../../../api/authApi';
 import { validateRegisterForm } from '../../../utils/validators';
 import { AuthContext } from '../../../context/AuthContext';
 import styles from './RegisterScreen.styles';
@@ -22,27 +21,24 @@ const RegisterScreen = ({ navigation }) => {
   });
 
   const handleRegister = async () => {
+    setLoading(true);
+    
     const { isValid, errors: validationErrors } = validateRegisterForm(username, email, password);
     
     if (!isValid) {
       setErrors(validationErrors);
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setErrors({ ...errors, general: '' });
-    
     try {
-      const result = await registerUser(username, email, password);
-      
-      if (result.success) {
-        // После успешной регистрации автоматически логиним пользователя
-        await login(result.token);
-      } else {
-        setErrors({ ...validationErrors, general: result.error });
+      const success = await register(username, email, password);
+
+      if (!success) {
+        setErrors(prev => ({ ...prev, general: 'Ошибка регистрации' }));
       }
     } catch (error) {
-      setErrors({ ...errors, general: error.message });
+      setErrors(prev => ({ ...prev, general: error.message || 'Ошибка регистрации' }));
     } finally {
       setLoading(false);
     }
@@ -61,7 +57,10 @@ const RegisterScreen = ({ navigation }) => {
               label="Имя пользователя"
               placeholder="Buharik228"
               value={username}
-              onChangeText={setUsername}
+              onChangeText={text => {
+                setUsername(text);
+                setErrors(prev => ({ ...prev, username: '' }));
+              }}
               error={errors.username}
             />
             
@@ -69,7 +68,10 @@ const RegisterScreen = ({ navigation }) => {
               label="Электронная почта"
               placeholder="beer_lover@gmail.com"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={text => {
+                setEmail(text);
+                setErrors(prev => ({ ...prev, email: '' }));
+              }}
               keyboardType="email-address"
               error={errors.email}
             />
@@ -78,7 +80,10 @@ const RegisterScreen = ({ navigation }) => {
               label="Пароль"
               placeholder="**************"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={text => {
+                setPassword(text);
+                setErrors(prev => ({ ...prev, password: '' }));
+              }}
               secureTextEntry
               error={errors.password}
             />
@@ -92,8 +97,9 @@ const RegisterScreen = ({ navigation }) => {
           
           <Button 
             title="Зарегистрироваться"
-            onPress={() => {register(username, email, password)}}
+            onPress={handleRegister}
             isLoading={loading}
+            disabled={loading}
           />
         </View>
         

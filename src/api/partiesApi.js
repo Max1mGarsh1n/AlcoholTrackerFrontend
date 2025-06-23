@@ -1,26 +1,25 @@
-import { getUserIdFromToken } from '../utils/jwtUtils';
-import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 import { API_URL } from '../config/config';
+import { getStoredToken, getStoredUserData } from '../utils/storage';
+
+const getAuthHeaders = async () => {
+  const token = await getStoredToken();
+  if (!token) throw new Error('Token not found');
+  return {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+};
 
 export const fetchParties = async () => {
   try {
-    const userId = await getUserIdFromToken();
-    console.debug("fetchUserProfile:", userId);
-    if (!userId) throw new Error('User ID not found');
-    
-    const response = await fetch(`${API_URL}/parties/${userId}`, {
-      method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${await SecureStore.getItemAsync('accessToken')}`
-            }
-    });
+    const userInfo = await getStoredUserData();
+    if (!userInfo?.userId) throw new Error('User ID not found');
 
-    if (!response.ok) {
-      throw new Error('Ошибка при загрузке застолий');
-    }
+    const headers = await getAuthHeaders();
+    const response = await axios.get(`${API_URL}/parties/${userInfo.userId}`, { headers });
 
-    return await response.json();
+    return response.data;
   } catch (error) {
     console.error('Fetch parties error:', error);
     throw error;
@@ -29,44 +28,27 @@ export const fetchParties = async () => {
 
 export const fetchPartyDetails = async (userId, partyId) => {
   try {
-    const token = await SecureStore.getItemAsync('accessToken');
-    
-    const response = await fetch(`${API_URL}/parties/${userId}/${partyId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    if (!userId) throw new Error('User ID not found');
 
-    if (!response.ok) {
-      throw new Error('Ошибка при загрузке деталей застолья');
-    }
+    const headers = await getAuthHeaders();
+    const response = await axios.get(`${API_URL}/parties/${userId}/${partyId}`, { headers });
 
-    return await response.json();
+    return response.data;
   } catch (error) {
     console.error('Fetch party details error:', error);
     throw error;
   }
 };
 
-export const createParty = async (userId, partyData) => {
+export const createParty = async (partyData) => {
   try {
-    const token = await SecureStore.getItemAsync('accessToken');
-    
-    const response = await fetch(`${API_URL}/parties/${userId}/create`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(partyData)
-    });
+    const userInfo = await getStoredUserData();
+    if (!userInfo?.userId) throw new Error('User ID not found');
 
-    if (!response.ok) {
-      throw new Error('Ошибка при создании застолья');
-    }
+    const headers = await getAuthHeaders();
+    const response = await axios.post(`${API_URL}/parties/${userInfo.userId}/create`, partyData, { headers });
 
-    return await response.json();
+    return response.data;
   } catch (error) {
     console.error('Create party error:', error);
     throw error;

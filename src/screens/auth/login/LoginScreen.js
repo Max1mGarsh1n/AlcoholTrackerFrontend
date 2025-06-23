@@ -1,9 +1,8 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { View, Text } from 'react-native';
 import AuthHeader from '../../../components/auth/AuthHeader';
 import Button from '../../../components/common/Button';
 import TextInput from '../../../components/common/TextInput';
-import { loginUser } from '../../../api/authApi';
 import { validateLoginForm } from '../../../utils/validators';
 import { AuthContext } from '../../../context/AuthContext';
 import styles from './LoginScreen.styles';
@@ -22,17 +21,38 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     setLoading(true);
-    setErrors({ email: '', password: '', general: '' });
-
-    const result = await loginUser(email, password);
     
-    if (result.success) {
-      await login(result.token);
-    } else {
-      setErrors({ ...errors, general: result.error });
+    // Валидация формы перед отправкой
+    const { isValid, errors: validationErrors } = validateLoginForm(email, password);
+    
+    if (!isValid) {
+      setErrors(validationErrors);
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    try {
+      const success = await login(email, password);
+      
+      if (!success) {
+        setErrors(prev => ({ ...prev, general: 'Неверная почта или пароль' }));
+      }
+    } catch (error) {
+      setErrors(prev => ({ ...prev, general: error.message || 'Ошибка входа' }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Очистка ошибок при изменении полей
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    setErrors(prev => ({ ...prev, email: '' }));
+  };
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+    setErrors(prev => ({ ...prev, password: '' }));
   };
 
   return (
@@ -48,28 +68,35 @@ const LoginScreen = ({ navigation }) => {
               label="Электронная почта"
               placeholder="beer_lover@gmail.com"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleEmailChange}
               keyboardType="email-address"
               error={errors.email}
+              autoCapitalize="none"
             />
             
             <TextInput
               label="Пароль"
               placeholder="**************"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
               secureTextEntry={true}
               error={errors.password}
+              autoCapitalize="none"
             />
           </View>
           
           {errors.general ? (
-            <Text style={{ color: '#ff5252', textAlign: 'center' }}>
+            <Text style={styles.errorText}>
               {errors.general}
             </Text>
           ) : null}
           
-          <Button title="Войти" onPress={() => {login(email, password)}} isLoading={loading} />
+          <Button 
+            title="Войти" 
+            onPress={handleLogin} 
+            isLoading={loading}
+            disabled={loading}
+          />
         </View>
         
         <View style={styles.newUser}>
@@ -77,8 +104,7 @@ const LoginScreen = ({ navigation }) => {
           <Button 
             title="Зарегистрироваться"
             onPress={() => navigation.navigate('Register')}
-            isLoading={loading}
-            backgroundColor="#1a1a1a"
+            variant="text"
             textColor="#d4af37"
             textStyle={styles.registerButtonText}
           />

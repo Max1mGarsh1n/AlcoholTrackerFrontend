@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { View, ScrollView, Text, TextInput, TouchableOpacity, Switch } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import styles from './NewPartyScreen.styles';
 
 export default function NewPartyScreen({ navigation }) {
+  // Данные с бэка (заглушка)
+  const [userData, setUserData] = useState({
+    weight: 75,
+    age: 30,
+    gender: 'male',
+    height: 180
+  });
+
   const [request, setRequest] = useState({
-    weight: '',
-    age: '',
-    gender: true, // true = male, false = female
-    height: '',
-    personalConst: '0.7', // Default for male
-    desiredPromille: '0.5' // Default desired level
+    hungerLevel: 'normal', // hungry, normal, full
+    isDriver: false,
+    isMother: false,
+    desiredPromille: '0.5'
   });
 
   const handleInputChange = (field, value) => {
@@ -19,111 +25,122 @@ export default function NewPartyScreen({ navigation }) {
     }));
   };
 
-  const handleGenderChange = (value) => {
-    const newGender = !request.gender;
-    handleInputChange('gender', newGender);
-    // Update personalConst based on gender
-    handleInputChange('personalConst', newGender ? '0.7' : '0.6');
-  };
-
   const calculate = () => {
-    // Validate inputs
-    if (!request.weight || !request.age || !request.height) {
-      alert('Пожалуйста, заполните все обязательные поля');
-      return;
-    }
-
-    navigation.navigate('CalculationResult', {
+    navigation.replace('CalculationResult', {
       request: {
+        ...userData,
         ...request,
-        weight: parseFloat(request.weight),
-        age: parseInt(request.age),
-        height: parseFloat(request.height),
-        personalConst: parseFloat(request.personalConst),
         desiredPromille: parseFloat(request.desiredPromille)
       }
     });
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.header}>Расчёт алкоголя</Text>
 
-      <Text style={styles.sectionTitle}>Основные параметры</Text>
-      
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Вес (кг)*</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={request.weight}
-          onChangeText={(text) => handleInputChange('weight', text)}
-          placeholder="Например: 70"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Рост (см)*</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={request.height}
-          onChangeText={(text) => handleInputChange('height', text)}
-          placeholder="Например: 175"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Возраст*</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={request.age}
-          onChangeText={(text) => handleInputChange('age', text)}
-          placeholder="Например: 30"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Пол</Text>
-        <View style={styles.switchContainer}>
-          <Text style={styles.switchLabel}>{request.gender ? 'Мужской' : 'Женский'}</Text>
-          <Switch
-            value={request.gender}
-            onValueChange={handleGenderChange}
-            thumbColor="#4a90e2"
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-          />
+      <View style={styles.userDataContainer}>
+        <Text style={styles.sectionTitle}>Ваши данные</Text>
+        <View style={styles.userDataRow}>
+          <Text style={styles.userDataLabel}>Вес:</Text>
+          <Text style={styles.userDataValue}>{userData.weight} кг</Text>
+        </View>
+        <View style={styles.userDataRow}>
+          <Text style={styles.userDataLabel}>Рост:</Text>
+          <Text style={styles.userDataValue}>{userData.height} см</Text>
+        </View>
+        <View style={styles.userDataRow}>
+          <Text style={styles.userDataLabel}>Возраст:</Text>
+          <Text style={styles.userDataValue}>{userData.age} лет</Text>
+        </View>
+        <View style={styles.userDataRow}>
+          <Text style={styles.userDataLabel}>Пол:</Text>
+          <Text style={styles.userDataValue}>
+            {userData.gender === 'male' ? 'Мужской' : 'Женский'}
+          </Text>
         </View>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Персональная константа</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={request.personalConst}
-          onChangeText={(text) => handleInputChange('personalConst', text)}
-          editable={false}
-        />
-        <Text style={styles.hintText}>
-          {request.gender 
-            ? '0.7 - стандарт для мужчин' 
-            : '0.6 - стандарт для женщин'}
-        </Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Уровень сытости</Text>
+        <View style={styles.hungerLevelContainer}>
+          {['hungry', 'normal', 'full'].map(level => (
+            <TouchableOpacity
+              key={level}
+              style={[
+                styles.hungerLevelButton,
+                request.hungerLevel === level && styles.hungerLevelButtonSelected
+              ]}
+              onPress={() => handleInputChange('hungerLevel', level)}
+            >
+              <Text style={[
+                styles.hungerLevelText,
+                request.hungerLevel === level && styles.hungerLevelTextSelected
+              ]}>
+                {level === 'hungry' ? 'Голоден' : 
+                 level === 'normal' ? 'Поел бы' : 'Сыт'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Желаемый уровень промилле</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={request.desiredPromille}
-          onChangeText={(text) => handleInputChange('desiredPromille', text)}
-        />
-        <Text style={styles.hintText}>
-          Рекомендуется не более 0.5 промилле
-        </Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Особые условия</Text>
+        <View style={styles.specialConditionsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.specialConditionButton,
+              request.isDriver && styles.specialConditionButtonSelected
+            ]}
+            onPress={() => handleInputChange('isDriver', !request.isDriver)}
+          >
+            <Text style={[
+              styles.specialConditionText,
+              request.isDriver && styles.specialConditionTextSelected
+            ]}>
+              Я водитель
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.specialConditionButton,
+              request.isMother && styles.specialConditionButtonSelected
+            ]}
+            onPress={() => handleInputChange('isMother', !request.isMother)}
+          >
+            <Text style={[
+              styles.specialConditionText,
+              request.isMother && styles.specialConditionButtonSelected
+            ]}>
+              Я мать
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Желаемый уровень промилле</Text>
+        <View style={styles.promilleContainer}>
+          {['0.3', '0.5', '0.7'].map(promille => (
+            <TouchableOpacity
+              key={promille}
+              style={[
+                styles.promilleButton,
+                request.desiredPromille === promille && styles.promilleButtonSelected
+              ]}
+              onPress={() => handleInputChange('desiredPromille', promille)}
+            >
+              <Text style={[
+                styles.promilleText,
+                request.desiredPromille === promille && styles.promilleTextSelected
+              ]}>
+                {promille}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Text style={styles.hintText}>Рекомендуется не более 0.5 промилле</Text>
       </View>
 
       <TouchableOpacity style={styles.calculateButton} onPress={calculate}>

@@ -3,65 +3,136 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  contentContainer: {
     padding: 20,
-    backgroundColor: '#fff',
+    paddingBottom: 40,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#d3ae35',
+  },
+  section: {
+    marginBottom: 25,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 10,
+    padding: 15,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginTop: 15,
-    marginBottom: 10,
-    color: '#333',
-  },
-  inputGroup: {
     marginBottom: 15,
+    color: '#d3ae35',
   },
-  label: {
+  userDataContainer: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+  },
+  userDataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  userDataLabel: {
     fontSize: 16,
-    marginBottom: 5,
-    color: '#555',
+    color: '#fefffa',
     fontWeight: '500',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    padding: 10,
+  userDataValue: {
     fontSize: 16,
-    backgroundColor: '#fff',
+    color: '#d3ae35',
+    fontWeight: '500',
   },
-  switchContainer: {
+  hungerLevelContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    marginBottom: 10,
   },
-  switchLabel: {
+  hungerLevelButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#3a3a3a',
+    alignItems: 'center',
+  },
+  hungerLevelButtonSelected: {
+    backgroundColor: '#5a7454',
+  },
+  hungerLevelText: {
+    color: '#fefffa',
+    fontSize: 14,
+  },
+  hungerLevelTextSelected: {
+    color: '#fefffa',
+    fontWeight: 'bold',
+  },
+  specialConditionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  specialConditionButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#3a3a3a',
+    alignItems: 'center',
+  },
+  specialConditionButtonSelected: {
+    backgroundColor: '#5a7454',
+  },
+  specialConditionText: {
+    color: '#fefffa',
+    fontSize: 14,
+  },
+  specialConditionTextSelected: {
+    color: '#fefffa',
+    fontWeight: 'bold',
+  },
+  promilleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  promilleButton: {
+    width: '30%',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#3a3a3a',
+    alignItems: 'center',
+  },
+  promilleButtonSelected: {
+    backgroundColor: '#5a7454',
+  },
+  promilleText: {
+    color: '#fefffa',
     fontSize: 16,
-    color: '#555',
+  },
+  promilleTextSelected: {
+    color: '#fefffa',
+    fontWeight: 'bold',
   },
   hintText: {
     fontSize: 12,
-    color: '#777',
-    marginTop: 5,
+    color: '#d3ae35',
     fontStyle: 'italic',
   },
   calculateButton: {
-    backgroundColor: '#4a90e2',
-    padding: 15,
-    borderRadius: 6,
+    backgroundColor: '#5a7454',
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 40,
   },
   calculateButtonText: {
-    color: 'white',
+    color: '#fefffa',
     fontSize: 18,
     fontWeight: '600',
   },

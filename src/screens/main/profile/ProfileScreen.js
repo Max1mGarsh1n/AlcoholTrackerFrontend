@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { fetchUserProfile } from '../../../api/profileApi';
 import styles from './ProfileScreen.styles';
 import { AuthContext } from '../../../context/AuthContext';
-import * as SecureStore from 'expo-secure-store';
 
 const ProfileScreen = ({ navigation }) => {
   const { logout } = useContext(AuthContext);
@@ -18,9 +17,6 @@ const ProfileScreen = ({ navigation }) => {
 
   const loadUserProfile = async () => {
     try {
-      // SecureStore.deleteItemAsync('accessToken'),
-      // SecureStore.deleteItemAsync('userId'),
-      // SecureStore.deleteItemAsync('username')
       setLoading(true);
       setError(null);
       
@@ -85,7 +81,7 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <Text style={styles.name}>
-            {userData?.name || username || 'Пользователь'}
+            Привет, {userData?.name || username || 'Пользователь'}
           </Text>
           {username && <Text style={styles.username}></Text>}
         </View>
@@ -122,7 +118,6 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-// Компонент элемента профиля (без изменений)
 const ProfileItem = ({ icon, title, onPress }) => (
   <TouchableOpacity style={styles.profileItem} onPress={onPress}>
     <View style={styles.itemLeft}>

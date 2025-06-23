@@ -1,8 +1,46 @@
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TextInput, TouchableOpacity  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { getDrinkDetails, updateDrinkDetails } from '../../../api/drinksApi';
+import { DRINK_STRENGTH_RU } from '../../../constants/DRINK_STRENGTH_RU';
+import styles from './DrinkDetailScreen.styles'; 
 
 export default function DrinkDetailScreen({ route }) {
-  const { drink } = route.params;
+  const { drinkId, isCustom } = route.params;
+
+  const [drink, setDrink] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [name, setName] = useState('');
+  const [degree, setDegree] = useState('');
+  const [info, setInfo] = useState('');
+
+  useEffect(() => {
+    const loadDrink = async () => {
+      try {
+        setLoading(true);
+        const data = await getDrinkDetails(drinkId);
+        setDrink(data);
+        setName(data.name);
+        setDegree(data.degree.toString());
+        setInfo(data.info || '');
+      } catch (error) {
+        console.error('Ошибка загрузки напитка:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDrink();
+  }, [drinkId]);
+
+  if (loading || !drink) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#d3ae35" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -11,94 +49,51 @@ export default function DrinkDetailScreen({ route }) {
           <Ionicons name="beer" size={80} color="gray" />
         </View>
         <Text style={styles.title}>{drink.name}</Text>
-        <Text style={styles.subtitle}>{drink.type} • {drink.degree}</Text>
+        <Text style={styles.subtitle}>
+          {DRINK_STRENGTH_RU[drink.type] || drink.type} • {drink.degree}%
+        </Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Информация</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Тип:</Text>
-          <Text style={styles.infoValue}>{drink.type}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Крепость:</Text>
-          <Text style={styles.infoValue}>{drink.degree}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Описание:</Text>
-          <Text style={styles.infoValue}>
-            {drink.description || 'Описание напитка отсутствует'}
-          </Text>
-        </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>История потребления</Text>
-        <Text style={styles.emptyHistory}>История потребления отсутствует</Text>
+        <Text style={styles.infoLabel}>Название</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          editable={isCustom}
+        />
+
+        <Text style={styles.infoLabel}>Крепость (%)</Text>
+        <TextInput
+          style={styles.input}
+          value={degree}
+          onChangeText={setDegree}
+          keyboardType="numeric"
+          editable={isCustom}
+        />
+
+        <Text style={styles.infoLabel}>Описание</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          value={info}
+          onChangeText={setInfo}
+          multiline
+          editable={isCustom}
+        />
+
+        {isCustom && (
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={() => {
+              // TODO: Добавьте функцию обновления напитка
+            }}
+          >
+            <Text style={styles.saveButtonText}>Сохранить</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  imagePlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#1e1e1e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
-  },
-  title: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  subtitle: {
-    color: 'orange',
-    fontSize: 16,
-  },
-  section: {
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    paddingBottom: 5,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    color: 'gray',
-    width: 100,
-    fontSize: 16,
-  },
-  infoValue: {
-    color: 'white',
-    flex: 1,
-    fontSize: 16,
-  },
-  emptyHistory: {
-    color: 'gray',
-    textAlign: 'center',
-    marginTop: 10,
-    fontStyle: 'italic',
-  },
-});
+};
