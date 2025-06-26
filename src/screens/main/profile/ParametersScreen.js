@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { updateUserProfile } from '../../../api/profileApi';
+import styles from './ParametersScreen.styles';
 
 const ParametersScreen = ({ navigation, route }) => {
   // Получаем данные профиля из параметров навигации
@@ -12,6 +13,15 @@ const ParametersScreen = ({ navigation, route }) => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const getGenderBackground = (value) => {
+    if (gender === value) {
+      return {
+        backgroundColor: value === 'female' ? '#d3ae35' : '#4CAF50'
+      };
+    }
+    return {};
+  };
 
   // Заполняем данные при получении userData
   useEffect(() => {
@@ -63,36 +73,31 @@ const ParametersScreen = ({ navigation, route }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Пол</Text>
             <View style={styles.genderToggleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.genderOption,
-                  gender === 'female' && styles.genderSelected
-                ]}
-                onPress={() => setGender('female')}
-              >
-                <Text style={[
-                  styles.genderText,
-                  gender === 'female' && styles.genderTextSelected
-                ]}>
-                  Ж
-                </Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.genderOption, getGenderBackground('female')]}
+              onPress={() => setGender('female')}
+            >
+              <Text style={[
+                styles.genderText,
+                gender === 'female' && styles.genderTextSelected
+              ]}>
+                Ж
+              </Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.genderOption,
-                  gender === 'male' && styles.genderSelected
-                ]}
-                onPress={() => setGender('male')}
-              >
-                <Text style={[
-                  styles.genderText,
-                  gender === 'male' && styles.genderTextSelected
-                ]}>
-                  М
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={[styles.genderOption, getGenderBackground('male')]}
+              onPress={() => setGender('male')}
+            >
+              <Text style={[
+                styles.genderText,
+                gender === 'male' && styles.genderTextSelected  // <-- здесь была ошибка
+              ]}>
+                М
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           </View>
 
           {/* Возраст */}
@@ -145,79 +150,5 @@ const ParametersScreen = ({ navigation, route }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  scrollContainer: { padding: 20, paddingBottom: 40 },
-  section: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-    fontSize: 16,
-  },
-  genderToggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#eee',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  genderOption: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  genderSelected: {
-    backgroundColor: 'orange',
-  },
-  genderText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
-  },
-  genderTextSelected: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  saveButton: {
-    backgroundColor: 'orange',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-});
 
 export default ParametersScreen;

@@ -30,7 +30,6 @@ export const validateRegisterForm = (username, email, password) => {
     isValid = false;
   }
 
-  // Переиспользуем валидацию email из login
   const emailValidation = validateLoginForm(email, 'dummy').errors;
   if (emailValidation.email) {
     errors.email = emailValidation.email;

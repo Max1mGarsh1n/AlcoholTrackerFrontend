@@ -5,6 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 export const decodeToken = async () => {
   try {
     const token = await SecureStore.getItemAsync('accessToken');
+
+    console.debug("decodeToken:", token);
     if (!token) return null;
     
     return jwtDecode(token);
@@ -17,6 +19,9 @@ export const decodeToken = async () => {
 // Получаем userID из токена
 export const getUserIdFromToken = async () => {
   const decoded = await decodeToken();
+
+  console.debug("getUserIdFromToken:", decoded?.userId);
+
   return decoded?.userId || null;
 };
 
@@ -38,14 +43,6 @@ export const saveUserData = async (token) => {
     ]);
   } catch (error) {
     console.error('Error saving user data:', error);
-    throw error; // Пробрасываем ошибку дальше для обработки
+    throw error;
   }
-};
-
-// Очищаем данные пользователя
-export const clearUserData = async () => {
-  await Promise.all([
-    SecureStore.deleteItemAsync('userId'),
-    SecureStore.deleteItemAsync('username')
-  ]);
 };

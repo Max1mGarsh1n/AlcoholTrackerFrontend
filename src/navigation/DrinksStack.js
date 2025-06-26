@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import DrinksScreen from '../screens/main/drinks/DrinksScreen';
-import DrinkDetailScreen from '../screens/main/drinks/DrinkDetailScreen';
-import AddDrinkScreen from '../screens/main/drinks/AddDrinkScreen';
+import DrinkDetailScreen from '../screens/main/drinks/drinkDetail/DrinkDetailScreen';
+import AddDrinkScreen from '../screens/main/drinks/addDrink/AddDrinkScreen';
 
 const Stack = createStackNavigator();
 

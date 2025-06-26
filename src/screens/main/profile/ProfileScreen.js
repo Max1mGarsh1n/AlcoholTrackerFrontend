@@ -1,15 +1,14 @@
-import { useState, useEffect, React } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { View, Text, TouchableOpacity, ScrollView, Switch, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { logoutUser, fetchUserProfile } from '../../../api/profileApi';
-import { clearAuthData } from '../../../utils/storage';
-import { navigateToAuth } from '../../../navigation/NavigationHelpers';
+import { fetchUserProfile } from '../../../api/profileApi';
 import styles from './ProfileScreen.styles';
+import { AuthContext } from '../../../context/AuthContext';
 
 const ProfileScreen = ({ navigation }) => {
+  const { logout } = useContext(AuthContext);
   const isFocused = useIsFocused();
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
@@ -38,24 +37,12 @@ const ProfileScreen = ({ navigation }) => {
       setLogoutLoading(true);
       setError(null);
       
-      // 1. Пытаемся выполнить логаут на бэкенде
-      const result = await logoutUser();
-      
-      // 2. В любом случае очищаем локальные данные
-      await clearAuthData();
-      
-      // 3. Если логаут на бэкенде не удался, показываем ошибку
-      if (!result.success) {
-        setError(result.error);
-        return;
-      }
-      
-      // 4. Перенаправляем на экран авторизации
-      navigateToAuth(navigation);
+      // Вызываем чистый логаут без API
+      await logout();
       
     } catch (error) {
       console.error('Logout error:', error);
-      setError('An unexpected error occurred');
+      setError('Произошла ошибка при выходе');
     } finally {
       setLogoutLoading(false);
     }
@@ -94,7 +81,7 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <Text style={styles.name}>
-            {userData?.name || username || 'Пользователь'}
+            Привет, {userData?.name || username || 'Пользователь'}
           </Text>
           {username && <Text style={styles.username}></Text>}
         </View>
@@ -111,20 +98,6 @@ const ProfileScreen = ({ navigation }) => {
             title="Параметры" 
             onPress={() => navigation.navigate('ParametersScreen', { userData })}
           />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Настройки</Text>
-          <View style={styles.profileItem}>
-            <View style={styles.itemLeft}>
-              <Ionicons name="moon" size={24} color="#666" style={styles.icon} />
-              <Text style={styles.itemText}>Смена темы</Text>
-            </View>
-            <Switch
-              value={isDarkTheme}
-              onValueChange={() => setIsDarkTheme(!isDarkTheme)}
-            />
-          </View>
         </View>
 
         <TouchableOpacity 
@@ -145,7 +118,6 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-// Компонент элемента профиля (без изменений)
 const ProfileItem = ({ icon, title, onPress }) => (
   <TouchableOpacity style={styles.profileItem} onPress={onPress}>
     <View style={styles.itemLeft}>

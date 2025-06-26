@@ -1,7 +1,7 @@
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import BasicDrinksScreen from './BasicDrinksScreen';
-import CustomDrinksScreen from './CustomDrinksScreen';
+import BasicDrinksScreen from './basicDrink/BasicDrinksScreen';
+import CustomDrinksScreen from './customDrink/CustomDrinksScreen';
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -17,8 +17,16 @@ export default function DrinksScreen({ navigation }) {
           tabBarStyle: { backgroundColor: 'black' },
         }}
       >
-        <TopTab.Screen name="BasicDrinks" component={BasicDrinksScreen} />
-        <TopTab.Screen name="CustomDrinks" component={CustomDrinksScreen} />
+        <TopTab.Screen 
+          name="BasicDrinks" 
+          component={BasicDrinksScreen} 
+          options={{ title: 'Общие' }} 
+        />
+        <TopTab.Screen 
+          name="CustomDrinks" 
+          component={CustomDrinksScreen} 
+          options={{ title: 'Ваши' }} 
+        />
       </TopTab.Navigator>
     </View>
   );

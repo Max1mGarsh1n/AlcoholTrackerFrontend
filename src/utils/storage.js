@@ -1,53 +1,58 @@
 import * as SecureStore from 'expo-secure-store';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
-
-export const saveToken = async (accessToken) => {
-  await SecureStore.setItemAsync('accessToken', accessToken);
-};
-
-export const getTokenData = async () => {
-  const token = await SecureStore.getItemAsync('accessToken');
-  if (!token) return null;
-  return jwtDecode(token);
-};
-
-// Получение userID
-export const getUserId = async () => {
-  const tokenData = await getTokenData();
-  return tokenData?.userId || null;
-};
-
-// Получение username
-export const getUsername = async () => {
-  const tokenData = await getTokenData();
-  return tokenData?.username || null;
-};
-
-
-
-// Получение токенов
-export const getToken = async () => {
+export const saveUserData = async (token) => {
   try {
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    return { accessToken };
+    if (!token) throw new Error('Пустой токен');
+
+    const decoded = jwtDecode(token);
+
+    const userData = {
+      userId: decoded.userId,
+      username: decoded.sub
+    };
+
+    await Promise.all([
+      SecureStore.setItemAsync('accessToken', token),
+      SecureStore.setItemAsync('userInfo', JSON.stringify(userData))
+    ]);
+
+    return userData;
   } catch (error) {
-    console.error('Ошибка получения токенов:', error);
-    return { accessToken: null };
+    console.error('Ошибка сохранения токена:', error);
+    return null;
   }
 };
 
 
-export const clearAuthData = async () => {
-  await Promise.all([
-    SecureStore.deleteItemAsync('accessToken'),
-    SecureStore.deleteItemAsync('userId'),
-    SecureStore.deleteItemAsync('username')
-  ]);
+export const getStoredToken = async () => {
+  try {
+    return await SecureStore.getItemAsync('accessToken');
+  } catch (error) {
+    console.error('Ошибка получения токена:', error);
+    return null;
+  }
 };
 
-// Проверка аутентификации
-export const isAuthenticated = async () => {
-  const { accessToken } = await getToken();
-  return !!accessToken;
+export const getStoredUserData = async () => {
+  try {
+    const userInfoStr = await SecureStore.getItemAsync('userInfo');
+    return userInfoStr ? JSON.parse(userInfoStr) : null;
+  } catch (error) {
+    console.error('Ошибка получения данных пользователя:', error);
+    return null;
+  }
+};
+
+export const clearUserData = async () => {
+  try {
+    await Promise.all([
+      SecureStore.deleteItemAsync('accessToken'),
+      SecureStore.deleteItemAsync('userInfo')
+    ]);
+    return true;
+  } catch (error) {
+    console.error('Ошибка очистки данных пользователя:', error);
+    return false;
+  }
 };

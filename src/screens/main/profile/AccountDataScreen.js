@@ -6,7 +6,6 @@ import styles from './AccountDataScreen.styles';
 const AccountDataScreen = ({ navigation, route }) => {
   const { userData } = route.params || {};
 
-  // Состояния для редактируемых полей
   const [username, setUsername] = useState(userData?.username || '');
   const [email, setEmail] = useState(userData?.email || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -15,11 +14,9 @@ const AccountDataScreen = ({ navigation, route }) => {
     try {
       setIsLoading(true);
       
-      // Используем текущие значения из состояния, а не из userData
       const body = {
         username,
         email,
-        // Добавляем остальные поля, которые могут требоваться на бэкенде
         gender: userData?.gender,
         age: userData?.age,
         height: userData?.height,

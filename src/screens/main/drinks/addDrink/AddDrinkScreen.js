@@ -1,18 +1,39 @@
-// src/screens/main/AddDrinkScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Alert, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { DRINK_STRENGTH_RU } from '../../../../constants/DRINK_STRENGTH_RU';
+import { Picker } from '@react-native-picker/picker';
+import { createDrink } from '../../../../api/drinksApi';
+import styles from './AddDrinkScreen.styles';
 
 export default function AddDrinkScreen({ navigation }) {
   const [name, setName] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState('LOW_ALCOHOL');
   const [degree, setDegree] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleSave = () => {
-    // Логика сохранения напитка
-    console.log('Сохранение напитка:', { name, type, degree, description });
-    navigation.goBack();
+  const handleSave = async () => {
+    if (!name || !degree) {
+      Alert.alert('Ошибка', 'Пожалуйста, введите название и крепость напитка.');
+      return;
+    }
+
+    const payload = {
+      name,
+      type,
+      degree: parseFloat(degree),
+      info: description,
+    };
+
+    try {
+      const result = await createDrink(payload);
+      console.log('Напиток создан:', result);
+      Alert.alert('Успешно', 'Напиток добавлен!');
+      //navigation.goBack();
+      //navigation.navigate('CustomDrinks', { refresh: true });
+    } catch (error) {
+      Alert.alert('Ошибка', 'Не удалось создать напиток');
+    }
   };
 
   return (
@@ -30,13 +51,18 @@ export default function AddDrinkScreen({ navigation }) {
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Тип напитка</Text>
-        <TextInput
-          style={styles.input}
-          value={type}
-          onChangeText={setType}
-          placeholder="Например: Крепкий, Слабоалкогольный"
-          placeholderTextColor="#555"
-        />
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={type}
+            onValueChange={(itemValue) => setType(itemValue)}
+            dropdownIconColor="white"
+            style={styles.picker}
+          >
+            {Object.entries(DRINK_STRENGTH_RU).map(([key, label]) => (
+              <Picker.Item key={key} label={label} value={key} />
+            ))}
+          </Picker>
+        </View>
       </View>
 
       <View style={styles.formGroup}>
@@ -69,43 +95,4 @@ export default function AddDrinkScreen({ navigation }) {
       </TouchableOpacity>
     </ScrollView>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 20,
-  },
-  formGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: '#1e1e1e',
-    color: 'white',
-    borderRadius: 8,
-    padding: 15,
-    fontSize: 16,
-  },
-  textArea: {
-    height: 120,
-    textAlignVertical: 'top',
-  },
-  saveButton: {
-    backgroundColor: 'orange',
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
+};
