@@ -21,7 +21,7 @@ export default StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#d3ae35',
+    color: '#4CAF50',
     marginBottom: 5,
   },
   username: {

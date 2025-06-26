@@ -26,13 +26,19 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 15,
-    color: '#d3ae35',
+    color: '#fefffa',
+  },
+  centeredText: {
+    textAlign: 'center',
+    alignSelf: 'center',
+    flexWrap: 'wrap',
+    width: '100%',
   },
   userDataContainer: {
     backgroundColor: '#2a2a2a',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 20
   },
   userDataRow: {
     flexDirection: 'row',
@@ -63,7 +69,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   hungerLevelButtonSelected: {
-    backgroundColor: '#5a7454',
+    backgroundColor: '#4CAF50',
   },
   hungerLevelText: {
     color: '#fefffa',
@@ -97,7 +103,6 @@ export default StyleSheet.create({
     fontWeight: 'bold',
   },
   promilleContainer: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
   },
@@ -125,7 +130,7 @@ export default StyleSheet.create({
     fontStyle: 'italic',
   },
   calculateButton: {
-    backgroundColor: '#5a7454',
+    backgroundColor: '#4CAF50',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -136,4 +141,11 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  selectedPromilleText: {
+    color: '#d3ae35',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 8,
+  }
+
 });

@@ -1,6 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import PartiesScreen from '../screens/main/parties/PartiesScreen';
-import FeedbackScreen from '../screens/main/parties/FeedbackScreen';
 import NewPartyScreen from '../screens/main/parties/NewPartyScreen';
 import PartyDetailsScreen from '../screens/main/parties/PartyDetailsScreen';
 import CalculationResultScreen from '../screens/main/parties/CalculationResultScreen';
@@ -14,11 +13,6 @@ export default function PartiesStackNavigator() {
         name="PartiesMain" 
         component={PartiesScreen} 
         options={{ headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="Feedback" 
-        component={FeedbackScreen} 
-        options={{ title: 'Оставить отзыв' }} 
       />
       <Stack.Screen 
         name="NewParty" 
@@ -47,8 +41,10 @@ export default function PartiesStackNavigator() {
         component={CalculationResultScreen} 
         options={{ 
           title: 'Результаты расчёта',
+          headerStyle: { backgroundColor: 'black' },
+          headerTintColor: 'white',
         }} 
       />
     </Stack.Navigator>
   );
-}
+};

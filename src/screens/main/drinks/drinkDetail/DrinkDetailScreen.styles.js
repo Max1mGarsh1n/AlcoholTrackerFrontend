@@ -35,6 +35,11 @@ export default StyleSheet.create({
     width: '80%',
     textAlign: 'center',
   },
+  title: {
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    fontSize: 22,
+  },
   subtitle: {
     color: 'orange',
     fontSize: 16,
@@ -77,7 +82,7 @@ export default StyleSheet.create({
     marginBottom: 10,
   },
   saveButton: {
-    backgroundColor: '#5a7454',
+    backgroundColor: '#4CAF50',
     borderRadius: 5,
     paddingVertical: 12,
     paddingHorizontal: 25,
@@ -88,5 +93,46 @@ export default StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pickerWrapper: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 8,
+  },
+  picker: {
+    color: 'white',
+    height: 60,
+  },
+  formGroup: {
+    marginBottom: 10,
+  },
+  label: {
+    color: 'white',
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  trashButton: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    zIndex: 10,
+    backgroundColor: 'rgba(30, 30, 30, 0.8)',
+    borderRadius: 22,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  favoriteButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    zIndex: 10,
+    backgroundColor: 'rgba(30, 30, 30, 0.8)',
+    borderRadius: 22,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

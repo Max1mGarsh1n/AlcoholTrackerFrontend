@@ -14,6 +14,15 @@ const ParametersScreen = ({ navigation, route }) => {
   const [weight, setWeight] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const getGenderBackground = (value) => {
+    if (gender === value) {
+      return {
+        backgroundColor: value === 'female' ? '#d3ae35' : '#4CAF50'
+      };
+    }
+    return {};
+  };
+
   // Заполняем данные при получении userData
   useEffect(() => {
     if (userData) {
@@ -64,36 +73,31 @@ const ParametersScreen = ({ navigation, route }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Пол</Text>
             <View style={styles.genderToggleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.genderOption,
-                  gender === 'female' && styles.genderSelected
-                ]}
-                onPress={() => setGender('female')}
-              >
-                <Text style={[
-                  styles.genderText,
-                  gender === 'female' && styles.genderTextSelected
-                ]}>
-                  Ж
-                </Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.genderOption, getGenderBackground('female')]}
+              onPress={() => setGender('female')}
+            >
+              <Text style={[
+                styles.genderText,
+                gender === 'female' && styles.genderTextSelected
+              ]}>
+                Ж
+              </Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.genderOption,
-                  gender === 'male' && styles.genderSelected
-                ]}
-                onPress={() => setGender('male')}
-              >
-                <Text style={[
-                  styles.genderText,
-                  gender === 'male' && styles.genderTextSelected
-                ]}>
-                  М
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={[styles.genderOption, getGenderBackground('male')]}
+              onPress={() => setGender('male')}
+            >
+              <Text style={[
+                styles.genderText,
+                gender === 'male' && styles.genderTextSelected  // <-- здесь была ошибка
+              ]}>
+                М
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           </View>
 
           {/* Возраст */}

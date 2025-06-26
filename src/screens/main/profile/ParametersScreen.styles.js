@@ -50,7 +50,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   genderSelected: {
-    backgroundColor: '#5a7454',
+    backgroundColor: '#4CAF50',
   },
   genderText: {
     color: '#fefffa',
@@ -61,7 +61,7 @@ export default StyleSheet.create({
     color: '#fefffa',
   },
   saveButton: {
-    backgroundColor: '#5a7454',
+    backgroundColor: '#4CAF50',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

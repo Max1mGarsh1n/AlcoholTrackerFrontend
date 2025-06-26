@@ -1,14 +1,38 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import styles from './PartyDetailsScreen.styles';
-import { fetchPartyDetails } from '../../../api/partiesApi';
+import { fetchPartyDetails, sendFeedback  } from '../../../api/partiesApi';
+
+export const FEEDBACK_OPTIONS = [
+  'Мало',
+  'В самый раз',
+  'Много',
+  'Слишком мало',
+  'Слишком много',
+];
+
+export const FEEDBACK_TO_ENUM = {
+  'Мало': 'LITTLE',
+  'В самый раз': 'NORMAL',
+  'Много': 'A_LOT',
+  'Слишком мало': 'TOO_LITTLE',
+  'Слишком много': 'TOO_MUCH',
+};
+
+const SATIETY_TRANSLATIONS = {
+  HUNGRY: 'Голоден',
+  NORMAL: 'Нормально',
+  FULL: 'Сыт',
+};
 
 export default function PartyDetailsScreen({ route }) {
-  const { partyId, userId } = route.params;
+  const { partyId, userId, needFeedback } = route.params;
 
   const [party, setParty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     const loadPartyDetails = async () => {
@@ -27,6 +51,28 @@ export default function PartyDetailsScreen({ route }) {
 
     loadPartyDetails();
   }, [partyId, userId]);
+
+  const handleSendFeedback = async () => {
+    if (!selectedFeedback) {
+      Alert.alert('Выберите фидбэк', 'Пожалуйста, выберите один из вариантов.');
+      return;
+    }
+
+    const feedbackEnum = FEEDBACK_TO_ENUM[selectedFeedback];
+    if (!feedbackEnum) {
+      Alert.alert('Ошибка', 'Некорректный фидбэк.');
+      return;
+    }
+
+    try {
+      await sendFeedback(feedbackEnum, partyId);
+      Alert.alert('Спасибо!', 'Ваш фидбэк отправлен.');
+      setFeedbackSent(true);
+    } catch (error) {
+      console.log('Feedback error (UI):', error);
+      Alert.alert('Ошибка', 'Не удалось отправить фидбэк. Попробуйте позже.');
+    }
+  };
 
   if (loading) {
     return (
@@ -48,6 +94,36 @@ export default function PartyDetailsScreen({ route }) {
 
   return (
     <View style={styles.container}>
+      {needFeedback && !feedbackSent && (
+        <View style={styles.feedbackContainer}>
+          <Text style={styles.feedbackLabel}>Как вам зашло?</Text>
+          <View style={styles.feedbackOptionsContainer}>
+            {FEEDBACK_OPTIONS.map(option => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.feedbackOption,
+                  selectedFeedback === option && styles.feedbackOptionSelected
+                ]}
+                onPress={() => setSelectedFeedback(option)}
+              >
+                <Text
+                  style={[
+                    styles.feedbackOptionText,
+                    selectedFeedback === option && styles.feedbackOptionTextSelected
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.feedbackSubmitButton} onPress={handleSendFeedback}>
+            <Text style={styles.feedbackSubmitButtonText}>ОТПРАВИТЬ</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.topContainer}>
         <Text style={styles.title}>Детали вечеринки</Text>
 
@@ -71,18 +147,34 @@ export default function PartyDetailsScreen({ route }) {
 
         <View style={styles.detailRow}>
           <Text style={styles.label}>Сытость:</Text>
-          <Text style={styles.value}>{party.satiety}</Text>
+          <Text style={styles.value}>
+            {SATIETY_TRANSLATIONS[party.satiety] || 'Неизвестно'}
+          </Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Вы водитель:</Text>
-          <Text style={styles.value}>{party.isDriver ? 'Да' : 'Нет'}</Text>
+          <Text style={styles.label}>Желаемый промилле:</Text>
+          <Text style={styles.value}>
+            {party.desiredPromille?.toFixed(2) ?? '—'}
+          </Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.label}>Вы мать:</Text>
-          <Text style={styles.value}>{party.isMother ? 'Да' : 'Нет'}</Text>
+          <Text style={styles.label}>Напитки:</Text>
         </View>
+
+        {party.drinks && party.drinks.length > 0 ? (
+          party.drinks.map((drink, index) => (
+            <View key={index} style={styles.drinkItem}>
+              <Text style={styles.drinkName}>
+                {drink.name} — {drink.volume} мл, {drink.degree}% алкоголя
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.value}>Нет данных о напитках</Text>
+        )}
+
       </View>
     </View>
   );

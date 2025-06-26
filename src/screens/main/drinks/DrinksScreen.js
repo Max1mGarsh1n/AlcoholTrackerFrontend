@@ -1,7 +1,7 @@
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import BasicDrinksScreen from './BasicDrinksScreen';
-import CustomDrinksScreen from './CustomDrinksScreen';
+import BasicDrinksScreen from './basicDrink/BasicDrinksScreen';
+import CustomDrinksScreen from './customDrink/CustomDrinksScreen';
 
 const TopTab = createMaterialTopTabNavigator();
 

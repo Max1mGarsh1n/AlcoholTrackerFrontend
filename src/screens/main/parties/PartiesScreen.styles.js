@@ -1,94 +1,119 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  // Главный контейнер, занимает весь экран
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#121212',
+    paddingTop: 40
   },
-  // Контейнер для центрирования контента (загрузка, ошибка)
   centeredContent: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
   },
-  // ВЕРХНЯЯ ЧАСТЬ ЭКРАНА: занимает всё свободное место и центрирует кнопку
-  topContainer: {
-    flex: 1, // <-- Самое важное: заставляет этот блок расширяться
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  newPartyButton: {
-    backgroundColor: '#5a7454',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12, // Увеличим радиус для более приятного вида
-    alignItems: 'center',
-    width: '90%', // Сделаем немного шире
-    elevation: 4, // Добавим тень
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  buttonText: {
-    color: '#fefffa',
-    fontSize: 18, // Увеличим шрифт
-    fontWeight: '600',
-  },
-  // НИЖНЯЯ ЧАСТЬ ЭКРАНА: контейнер для истории с фиксированной высотой
-  historyContainer: {
-    height: '50%', // <-- Самое важное: задает фиксированную высоту
-    backgroundColor: '#222222', // Слегка другой фон для визуального разделения
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+  fixedHeader: {
+    padding: 15,
+    backgroundColor: '#121212',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2a2a',
+    marginBottom: 10,
   },
   historyTitle: {
-    fontSize: 20, // Увеличим заголовок
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#d3ae35',
-    textAlign: 'center',
   },
-  partyItem: {
-    backgroundColor: '#2f2f2f',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
+  scrollableList: {
+    flex: 1,
+    marginBottom: 70, // Оставляем место для кнопки
   },
-  partyDate: {
+  listContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 15,
+    backgroundColor: '#121212',
+    borderTopWidth: 1,
+    borderTopColor: '#2a2a2a',
+  },
+  newPartyButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#fefffa',
     fontSize: 16,
   },
+  partyItem: {
+    backgroundColor: '#1e1e1e',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    marginHorizontal: 10,
+  },
+  partyItemNeedsFeedback: {
+    borderLeftWidth: 5,
+    borderLeftColor: '#d3ae35',
+  },
+  partyItemContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  partyTextContainer: {
+    flex: 1,
+  },
+  partyDate: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
   partyDescription: {
-    color: '#d3ae35',
+    color: '#aaa',
     fontSize: 14,
   },
+  feedbackBadgeContainer: {
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  feedbackBadge: {
+    backgroundColor: '#d3ae35',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  feedbackBadgeText: {
+    color: '#121212',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   emptyText: {
-    color: '#a0a0a0',
+    color: '#aaa',
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: 20,
     fontSize: 16,
   },
   errorText: {
-    color: '#ff6b6b',
+    color: '#ff4444',
     fontSize: 16,
-    textAlign: 'center',
     marginBottom: 20,
+    textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#5a7454',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    backgroundColor: '#d3ae35',
+    padding: 12,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#fefffa',
-    fontSize: 16,
+    color: '#121212',
+    fontWeight: 'bold',
   },
 });

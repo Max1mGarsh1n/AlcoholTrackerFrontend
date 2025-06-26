@@ -1,69 +1,87 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View, Text, FlatList, TouchableOpacity,
+  ActivityIndicator, RefreshControl
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { fetchUserDrinks } from '../../../api/drinksApi';
-import { DRINK_STRENGTH_RU } from '../../../constants/DRINK_STRENGTH_RU';
-import styles from './CustomDrinksScreen.styles';
+import { DRINK_STRENGTH_RU } from '../../constants/DRINK_STRENGTH_RU';
+import styles from './DrinkListScreen.styles';
 
-export default function CustomDrinksScreen({ navigation }) {
-  const [showScrollTop, setShowScrollTop] = useState(false);
+export default function DrinkListScreen({
+  fetchFunction,
+  navigation,
+  isCustom = false,
+  emptyText = 'Нет напитков',
+  showAddButton = false,
+}) {
   const [drinks, setDrinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollRef = useRef(null);
 
   const loadDrinks = useCallback(async (isRefresh = false) => {
     try {
       if (!isRefresh) setLoading(true);
       setError(null);
-      const data = await fetchUserDrinks();
+      const data = await fetchFunction();
       setDrinks(data);
     } catch (err) {
-      console.error('Load drinks error:', err);
-      setError(err.message || 'Ошибка загрузки напитков');
+      console.error(err);
+      setError('Ошибка загрузки напитков');
     } finally {
-      if (isRefresh) setRefreshing(false);
-      else setLoading(false);
+      isRefresh ? setRefreshing(false) : setLoading(false);
     }
-  }, []);
+  }, [fetchFunction]);
 
-  useEffect(() => {
-    loadDrinks();
-  }, [loadDrinks]);
+  useEffect(() => { loadDrinks(); }, [loadDrinks]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     loadDrinks(true);
   }, [loadDrinks]);
 
-  const handleScroll = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    setShowScrollTop(offsetY > 300);
+  const scrollToTop = () => scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
+
+  const handleScroll = ({ nativeEvent }) => {
+    setShowScrollTop(nativeEvent.contentOffset.y > 300);
   };
 
-  const scrollToTop = () => {
-    scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
-
-  const addNewDrink = () => {
-    navigation.navigate('AddDrink');
-  };
-
-  const renderDrinkItem = ({ item }) => (
-    <TouchableOpacity 
+  const renderDrinkItem = ({ item }) => {
+  return (
+    <TouchableOpacity
       style={styles.drinkCard}
-      onPress={() => navigation.navigate('DrinkDetail', { drinkId: item.drinkId,  isCustom: true })}
+      onPress={() =>
+        navigation.navigate('DrinkDetail', {
+          drinkId: item.drinkId,
+          isCustom: isCustom,
+          isFavorite: item.isFavorite,
+        })
+      }
     >
-      <View style={styles.drinkImagePlaceholder}>
-        <Ionicons name="beer" size={40} color="gray" />
+      <View style={{ width: '100%' }}>
+        {item.isFavorite && (
+          <Ionicons
+            name="heart"
+            size={20}
+            color="red"
+            style={styles.favoriteIcon}
+          />
+        )}
+        
+        <View style={styles.drinkImageWrapper}>
+          <Ionicons name="beer" size={40} color="gray" />
+        </View>
+        
+        <Text style={styles.drinkName}>{item.drinkName}</Text>
+        <Text style={styles.drinkInfo}>
+          {DRINK_STRENGTH_RU[item.type] || item.type} • {item.degree}%
+        </Text>
       </View>
-      <Text style={styles.drinkName}>{item.drinkName}</Text>
-      <Text style={styles.drinkInfo}>
-        {DRINK_STRENGTH_RU[item.type] || item.type} • {item.degree}%
-      </Text>
     </TouchableOpacity>
   );
+};
 
   if (loading && !refreshing) {
     return (
@@ -90,7 +108,7 @@ export default function CustomDrinksScreen({ navigation }) {
         ref={scrollRef}
         data={drinks}
         renderItem={renderDrinkItem}
-        keyExtractor={item => item.drinkId.toString()}
+        keyExtractor={(item) => item.drinkId.toString()}
         numColumns={2}
         contentContainerStyle={styles.listContent}
         refreshControl={
@@ -104,18 +122,19 @@ export default function CustomDrinksScreen({ navigation }) {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="sad-outline" size={50} color="gray" />
-            <Text style={styles.emptyText}>У вас пока нет своих напитков</Text>
-            <Text style={styles.emptySubText}>Нажмите "+" чтобы добавить</Text>
+            <Text style={styles.emptyText}>{emptyText}</Text>
           </View>
         }
         onScroll={handleScroll}
         scrollEventThrottle={16}
       />
-      
-      <TouchableOpacity style={styles.addButton} onPress={addNewDrink}>
-        <Ionicons name="add" size={30} color="white" />
-      </TouchableOpacity>
-      
+
+      {showAddButton && (
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddDrink')}>
+          <Ionicons name="add" size={30} color="white" />
+        </TouchableOpacity>
+      )}
+
       {showScrollTop && (
         <TouchableOpacity style={styles.scrollTopButton} onPress={scrollToTop}>
           <Ionicons name="arrow-up" size={24} color="white" />
